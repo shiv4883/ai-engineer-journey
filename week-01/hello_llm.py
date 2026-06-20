@@ -43,39 +43,35 @@ def main(provider: str= typer.Option(...,help="choose provided: groq or gemini")
          prompt: str= typer.Option(...,help="share your prompt"),
          mode: str= typer.Option("basic",help="select mode: basic, detailed or eli5")):
     
-    if mode == "basic":
-        if provider == "groq":
-            print("==groq==")
-            print(call_groq(prompt))
+    provider = provider.lower()
+    mode = mode.lower()
 
-        elif provider == "gemini":
-            print("==Gemini==")
-            print(call_gemini(prompt))
-        else:
-            print(f"{provider} is incorrect")
-    elif mode == "detailed":
-        if provider == "groq":
-            print("==groq==")
-            print(call_groq(prompt + ". Give a detailed technical explanation"))
+    # 2. Map and inject your system behavior modifications based on mode
+    mode_modifiers = {
+        "basic": "",
+        "detailed": ". Give a detailed technical explanation.",
+        "eli5": ". Explain like I am 5 years old.",
+    }
 
-        elif provider == "gemini":
-            print("==Gemini==")
-            print(call_gemini(prompt + ". Give a detailed technical explanation"))
-        else:
-            print(f"{provider} is incorrect")
-    elif mode == "eli5":
-        if provider == "groq":
-            print("==groq==")
-            print(call_groq(prompt + ". Explain like i am 5"))
+    if mode not in mode_modifiers:
+        typer.secho(f"Error: Mode '{mode}' is incorrect. Choose 'basic', 'detailed', or 'eli5'.", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1)
 
-        elif provider == "gemini":
-            print("==Gemini==")
-            print(call_gemini(prompt + ". Explain like i am 5"))
-        else:
-            print(f"{provider} is incorrect")
+    # Modify the prompt once right here
+    final_prompt = prompt + mode_modifiers[mode]
+
+    # 3. Route to the correct provider cleanly
+    if provider == "groq":
+        typer.secho("== Groq ==", fg=typer.colors.CYAN, bold=True)
+        print(call_groq(final_prompt))
+        
+    elif provider == "gemini":
+        typer.secho("== Gemini ==", fg=typer.colors.GREEN, bold=True)
+        print(call_gemini(final_prompt))
+        
     else:
-        print(f"the mode is incorrect. Choose one of 'basic', 'detailed' or 'eli5'.")
-
+        typer.secho(f"Error: Provider '{provider}' is incorrect. Use 'groq' or 'gemini'.", fg=typer.colors.RED, err=True)
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":
