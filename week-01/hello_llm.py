@@ -6,7 +6,7 @@ import typer
 import os
 load_dotenv()
 
-app = typer.Typer()
+app = typer.Typer(rich_help_panel="Utils")
 
 
 def call_gemini(prompt: str) -> str:
@@ -43,6 +43,9 @@ def main(provider: str= typer.Option(...,help="choose provided: groq or gemini")
          prompt: str= typer.Option(...,help="share your prompt"),
          mode: str= typer.Option("basic",help="select mode: basic, detailed or eli5")):
     
+    """
+    An AI Engineer CLI tool to query multiple LLM providers with different processing modes.
+    """
     provider = provider.lower()
     mode = mode.lower()
 
