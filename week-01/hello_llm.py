@@ -4,6 +4,14 @@ from groq import Groq
 import typer
 
 import os
+from pydantic import BaseModel
+
+class LLMResponse(BaseModel):
+    provider: str
+    prompt: str
+    response: str
+
+
 load_dotenv()
 
 app = typer.Typer(rich_help_panel="Utils")
@@ -54,6 +62,7 @@ def main(provider: str= typer.Option(...,help="choose provided: groq or gemini")
         "basic": "",
         "detailed": ". Give a detailed technical explanation.",
         "eli5": ". Explain like I am 5 years old.",
+
     }
 
     if mode not in mode_modifiers:
@@ -66,11 +75,15 @@ def main(provider: str= typer.Option(...,help="choose provided: groq or gemini")
     # 3. Route to the correct provider cleanly
     if provider == "groq":
         typer.secho("== Groq ==", fg=typer.colors.CYAN, bold=True)
-        print(call_groq(final_prompt))
+        raw = call_groq(final_prompt)
+        result = LLMResponse (provider=provider,prompt=prompt,response=raw)
+        print(result.response)
         
     elif provider == "gemini":
         typer.secho("== Gemini ==", fg=typer.colors.GREEN, bold=True)
-        print(call_gemini(final_prompt))
+        raw = call_gemini(final_prompt)
+        result = LLMResponse (provider=provider,prompt=prompt,response=raw)
+        print(result.response)
         
     else:
         typer.secho(f"Error: Provider '{provider}' is incorrect. Use 'groq' or 'gemini'.", fg=typer.colors.RED, err=True)
